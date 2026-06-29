@@ -1,0 +1,27 @@
+[
+  {
+    "idea": "AI copilot for restaurant inventory that predicts spoilage and auto-orders produce",
+    "teardown": "What you think you're building: an AI sous-chef that watches lettuce, chicken, and tomatoes decay in the walk-in and magically writes the next Sysco order. What you're actually building: a trust-and-liability layer between a kitchen manager, vendor minimums, menu mix, weather, and last night's no-shows. Why a16z passes: a forecast is not a company unless it changes a purchase order; Toast, Square, or the distributor can add 'suggested order quantity' faster than you can earn restaurant-by-restaurant trust. Funding probability: 53%. The one thing that could save it: guarantee a 3-5% food-cost reduction in 30 days for 5 multi-location groups, integrate into the POS/vendor order flow, and charge only from verified waste savings.",
+    "comparps": "Toast: won by owning POS/payments distribution in restaurants, not generic analytics. Shelf Engine: automated perishable ordering but had to manage spoilage risk operationally. BlueCart: restaurant procurement network where supplier workflow density is the value."
+  },
+  {
+    "idea": "A social fitness app where friends bet on weekly workouts",
+    "teardown": "What you think you're building: Strava plus Venmo stakes, where shame and $20 bets make friends exercise. What you're actually building: a consumer retention product with fraud-prone attendance proof, awkward money movement, and a January-2-to-February-15 churn cliff. Why a16z passes: 'friends invite friends' is not distribution when the core behavior is something users already avoid; betting also pulls in payments, disputes, and possibly gambling/compliance headaches. Funding probability: 14%. The one thing that could save it: sell through gyms, coaches, or employers that already have attendance data and recurring groups, then make bets settle from verified check-ins rather than selfies and honor-system screenshots.",
+    "comparps": "Strava: durable because athletes already generated repeat activity/status data. Gympass/Wellhub: avoided pure consumer churn by selling wellness through employers. StepBet: showed wager-based fitness can work, but proof, motivation decay, and scale are the hard parts."
+  },
+  {
+    "idea": "Crypto payroll for remote teams with automatic tax compliance",
+    "teardown": "What you think you're building: Deel for USDC payroll—one button to pay a contractor in Argentina, Germany, and India. What you're actually building: a regulated payroll/compliance company with wallet risk, FX/accounting treatment, country-specific withholding, worker classification, and support tickets whenever a transfer or tax form is wrong. Why a16z passes: the crypto piece is a feature; the company is won or lost in compliance operations and employer trust. Deel, Remote, and Rippling can add stablecoin rails if demand is real. Funding probability: 45%. The one thing that could save it: pick one corridor and one worker type, own filings plus audit trail end-to-end, and prove finance teams save days per month versus Deel plus manual crypto reimbursements.",
+    "comparps": "Deel: scaled by country-by-country compliance and payroll ops. Bitwage: real crypto payroll company, proving demand but also the niche nature of the wedge. Remote: competes on employer-of-record compliance, not just payment rails."
+  },
+  {
+    "idea": "Telehealth triage bot for dermatology clinics",
+    "teardown": "What you think you're building: patients upload rash photos, the bot triages urgency, and dermatologists get cleaner queues. What you're actually building: clinic workflow software that must handle liability, image quality, EHR handoff, false negatives, and staff adoption. Why a16z passes: a medical chatbot demo is easy; the defensible business is reimbursement, malpractice-safe protocols, and integration into how a clinic already schedules visits. Funding probability: 51%. The one thing that could save it: do not sell to consumers—sell to dermatology clinics as intake automation that produces EHR-ready notes, flags urgent lesions conservatively, and measures reduced nurse review time per patient.",
+    "comparps": "Ro: scaled telehealth by focusing on high-intent conditions and fulfillment. One Medical: proved care operations plus software before selling to Amazon. VisualDx: real clinical decision-support tool, showing the bar for medical trust and evidence."
+  },
+  {
+    "idea": "Marketplace for fractional CFOs for seed-stage startups",
+    "teardown": "What you think you're building: Upwork for startup finance, where founders instantly find a CFO before the board meeting. What you're actually building: a managed-service trust business where supply vetting, founder urgency, scope definition, and repeat outcomes matter more than the marketplace UI. Why a16z passes: seed startups are price-sensitive, sporadic buyers; marketplace liquidity will be fake until you manually match both sides and prove CFO work repeats beyond fundraising season. Funding probability: 27%. The one thing that could save it: start with SaaS companies at $1-10M ARR needing board packs, cash forecasting, and fundraising models; guarantee vetted deliverables and only later turn repeat workflows into software.",
+    "comparps": "Upwork: liquidity took years and trust remained hard. Toptal: won higher-value talent by heavy vetting/managed matching. Graphite: finance expert marketplace showing the niche can exist, but curation is the moat."
+  }
+]
