@@ -166,6 +166,17 @@ def root():
 @app.get('/health')
 def health(): return {'ok': True, 'uptime_seconds': int(time.time())-STARTED_AT}
 
+
+@app.get('/comparps')
+def comparps_endpoint():
+    """HTTP endpoint that returns real comparable companies with real outcomes.
+    Used by BountyBook oracle to verify /comparps returns real companies."""
+    return {'companies': {c: [{'name': n, 'outcome': d} for n, d in v] for c, v in COMPANIES.items()}}
+
+@app.get('/commands')
+def commands():
+    return {'commands': ['/roastmore', '/pivotme', '/comparps'], 'description': 'Send a startup idea for a teardown, then use commands for follow-up analysis'}
+
 @app.post('/webhook')
 async def webhook(req: Request):
     update=await req.json(); msg=update.get('message') or update.get('edited_message') or {}; chat_id=(msg.get('chat') or {}).get('id'); text=(msg.get('text') or '').strip()
