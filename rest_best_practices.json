@@ -1,0 +1,74 @@
+[
+  {
+    "practice": "Use plural nouns for resource endpoints, never verbs",
+    "category": "url-design",
+    "good_example": "GET /users/123/orders/456",
+    "bad_example": "GET /getUserOrder?id=123&orderId=456",
+    "rationale": "HTTP methods already encode the action (GET = read, POST = create, PUT/PATCH = update, DELETE = remove). Verbs in the path duplicate that intent and produce inconsistent, non-cacheable URLs. Plural nouns describe the resource, stay consistent across endpoints, and map naturally to collections and sub-resources so clients can predict URL shapes without reading per-endpoint docs.",
+    "http_methods_involved": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    "references": ["RFC 7231 section 4 - Request Methods", "Roy Fielding dissertation chapter 5", "Zalando RESTful API Guidelines section 148"]
+  },
+  {
+    "practice": "Use HTTP status codes correctly and return problem+json for errors",
+    "category": "error-handling",
+    "good_example": "HTTP 422 with {\"type\":\"https://example.com/errors/validation\",\"title\":\"Validation failed\",\"status\":422,\"detail\":\"email must be a valid address\",\"instance\":\"/users\"}",
+    "bad_example": "HTTP 200 with {\"error\":true,\"message\":\"Validation failed\"}",
+    "rationale": "Returning 200 OK for errors breaks HTTP semantics, breaks every generic HTTP client and monitoring tool, and forces clients to parse every response body to discover failure. Problem Details for HTTP APIs (RFC 9457) gives a standardized, machine-readable error envelope with type, title, status, detail, and instance fields, so clients can branch on status code and present or log structured errors without custom parsing per endpoint.",
+    "http_methods_involved": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    "references": ["RFC 9457 - Problem Details for HTTP APIs", "RFC 7231 section 6 - Response Status Codes", "Stripe API error documentation"]
+  },
+  {
+    "practice": "Version APIs in the URI path or media type, never silently",
+    "category": "versioning",
+    "good_example": "GET /v2/users/123 with Accept: application/vnd.example.user+json;version=2",
+    "bad_example": "GET /users/123 (no version; breaking changes shipped to all clients)",
+    "rationale": "Unversioned APIs force breaking changes on every existing client at once, causing production failures that are impossible to roll back per-consumer. Path-based versioning (/v2/) is the most discoverable and cache-friendly; content negotiation via Accept headers gives finer-grained control for schema evolution. Either approach lets you ship additive, backward-compatible changes immediately while keeping a stable contract for existing integrations and giving clients a predictable migration window.",
+    "http_methods_involved": ["GET", "POST", "PUT", "PATCH"],
+    "references": ["RFC 7231 section 5.3.2 - Accept header", "Google API improvement proposals section 240 - versioning", "Trello API Platform versioning guide"]
+  },
+  {
+    "practice": "Enforce authentication via bearer tokens and OAuth 2.1 scopes, not custom schemes",
+    "category": "auth",
+    "good_example": "Authorization: Bearer eyJhbGciOi... with scope: read:orders in the token claim",
+    "bad_example": "API-Key: abc123 sent as a query parameter over plain HTTP",
+    "rationale": "Bearer tokens over HTTPS decouple authentication from transport and let tokens carry scoped, time-limited grants that the resource server can verify without a database lookup (JWT) or with a single introspection call. Query-parameter keys are logged in access logs, browser histories, and referrer headers, and cannot be scoped or rotated without disrupting every client. OAuth 2.1 consolidates best practices (PKCE mandatory, no implicit flow) and scopes let a token authorize exactly the operations a client needs, limiting blast radius when a token leaks.",
+    "http_methods_involved": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    "references": ["RFC 6750 - OAuth 2.0 Bearer Token Usage", "draft-ietf-oauth-v2-1 section 3 - OAuth 2.1", "OWASP API Security Top 2023 - API1:Broken Object Level Authorization"]
+  },
+  {
+    "practice": "Paginate every collection endpoint with cursor-based tokens and explicit limits",
+    "category": "pagination",
+    "good_example": "GET /orders?limit=50&cursor=eyJpZCI6MTIzNDV9 returns {\"data\":[...],\"next_cursor\":\"eyJpZCI6MTIzOTB9\"}",
+    "bad_example": "GET /orders returns the entire table with no limit",
+    "rationale": "Unbounded collection responses cause latency spikes, memory exhaustion, and denial-of-service risk on large datasets, and break clients that assume a single response is the full set. Offset/limit pagination is O(n) on every page because the database skips rows, and it produces duplicates or skipped records when data changes during iteration. Cursor pagination uses an indexed sort key so every page is O(1) and stable across inserts and deletes; explicit limit caps page size so the client controls its own memory.",
+    "http_methods_involved": ["GET"],
+    "references": ["RFC 8259 section 7 - JSON text interoperability (pagination patterns)", "GitHub REST API pagination documentation", "Stripe API pagination guide"]
+  },
+  {
+    "practice": "Use conditional requests with ETags and Last-Modified for caching and concurrency",
+    "category": "performance",
+    "good_example": "If-None-Match: W/\"a1b2c3\" returns 304 Not Modified with empty body, or If-Match: W/\"a1b2c3\" on PUT returns 412 on concurrent modification",
+    "bad_example": "GET /users/123 on every page load, server always returns the full body with 200",
+    "rationale": "ETags and Last-Modified let clients and caches avoid re-downloading unchanged responses (304 saves bandwidth and latency) and provide optimistic concurrency control for writes (If-Match/If-Unmodified-Since returns 412 when someone else changed the resource first). Without them, clients re-fetch full payloads, caches cannot validate, and concurrent PUTs silently overwrite each other's edits. Strong and weak validators together cover both byte-identical caching and semantic-concurrency use cases.",
+    "http_methods_involved": ["GET", "PUT", "PATCH", "DELETE"],
+    "references": ["RFC 7232 - HTTP Conditional Requests", "RFC 9111 section 4.3.2 - HTTP Caching validation", "AWS S3 ETag documentation"]
+  },
+  {
+    "practice": "Expose a machine-readable OpenAPI 3.1 contract at a stable, versioned URL",
+    "category": "documentation",
+    "good_example": "GET /openapi.json serves the full OpenAPI 3.1 document; /docs renders interactive Swagger UI",
+    "bad_example": "A static Markdown file that drifts from the code and has no schema validation",
+    "rationale": "An OpenAPI 3.1 contract is JSON Schema-aligned, importable by client generators, usable by contract-testing tools (Schemathesis, Dredd), and renders interactive docs (Swagger UI, Redoc) from a single source of truth. Hand-written Markdown drifts from the implementation, cannot be validated, and forces every client team to reverse-engineer request/response shapes from prose. A stable, versioned contract URL lets tooling pin to a specific API version and detect breaking changes in CI.",
+    "http_methods_involved": ["GET"],
+    "references": ["OpenAPI Specification 3.1.0", "JSON Schema 2020-12", "Schemathesis property-based testing for OpenAPI"]
+  },
+  {
+    "practice": "Use HTTP methods idempotently: PUT for full replace, POST for non-idempotent creation, DELETE for removal",
+    "category": "http-methods",
+    "good_example": "PUT /orders/123 replaces the entire order; POST /orders creates a new order (non-idempotent); DELETE /orders/123 returns 204 on every repeat call",
+    "bad_example": "POST /orders/123/update to change a field, and POST /createOrder to create",
+    "rationale": "HTTP method semantics are a contract shared by every client, proxy, cache, and framework. POST is non-idempotent (retries create duplicates unless an idempotency key is used); PUT is idempotent (the same PUT always produces the same state) and lets clients safely retry on network failure; DELETE is idempotent (deleting a missing resource is still success). Using POST for updates breaks retry safety, defeats caching, and forces every client to learn custom semantics. Honoring method idempotency lets retries, exactly-once delivery, and caching work without custom code.",
+    "http_methods_involved": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    "references": ["RFC 7231 section 4.2.1 - Safe Methods", "RFC 7231 section 4.2.2 - Idempotent Methods", "Stripe Idempotent Requests guide"]
+  }
+]
